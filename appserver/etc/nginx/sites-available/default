@@ -1,0 +1,36 @@
+##
+# You should look at the following URL's in order to grasp a solid understanding
+# of Nginx configuration files in order to fully unleash the power of Nginx.
+# http://wiki.nginx.org/Pitfalls
+# http://wiki.nginx.org/QuickStart
+# http://wiki.nginx.org/Configuration
+#
+# Generally, you will want to move this file somewhere, and start with a clean
+# file but keep this around for reference. Or just disable in sites-enabled.
+#
+# Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
+##
+
+#
+
+proxy_cache_path /tmp/nginx-cache levels=1:2 keys_zone=my_proxy_cache:10m;
+
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	root /opt/test;
+
+	server_name _;
+
+	location /cgi-bin {
+		proxy_pass "http://127.0.0.1:8080";
+		proxy_cache my_proxy_cache;
+        	proxy_cache_valid any 1m;
+		add_header Cache-Control "private, max-age=600";
+	}
+	location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+		add_header Cache-Control "private, max-age=3600";
+	}
+}
+
